@@ -26,7 +26,7 @@ def init_char_matrix(width):
         CHARS_MATRIX[c.upper()] = char_to_pixels(c.upper(), './LiberationMono-Bold.ttf', width)
 
 class TextDisplayer():
-    default_color = (0, 0, 255)
+    default_color = (0, 0, 123)
     def __init__(self, pixels_strips, strip_offset=0):
         self.pixels_strips = pixels_strips
         self.strip_offset = strip_offset
@@ -43,7 +43,12 @@ class TextDisplayer():
 
         if position + letter_size > 0 and position < len(self.pixels_strips[0]):
             displayed = True
+
         for i, char_line in enumerate(char_mat):
+            if i >= len(self.pixels_strips):
+                print("overflow i", i, "len", len(self.pixels_strips))
+
+                break
             for j, v in enumerate(char_line):
                 if position + j > 0 and position + j < len(self.pixels_strips[self.strip_offset + i]):
                     # print("pos",position, "idx", position + j)

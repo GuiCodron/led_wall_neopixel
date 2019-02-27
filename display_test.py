@@ -7,16 +7,34 @@ import time
 PIX_WH=5
 NUM_STRIPS=8
 NUM_PIXELS=100
-CHAR_WIDTH=12
+CHAR_WIDTH=7
 init_char_matrix(CHAR_WIDTH)
 
 size = width, height = NUM_PIXELS * PIX_WH, NUM_STRIPS * PIX_WH
 
-pygame.init()
-screen = pygame.display.set_mode(size)
-screen.fill((0,0,0))
+def setup_pygame():
 
-pixels_strips = [FakeStrip(screen, i, NUM_PIXELS, PIX_WH) for i in range(NUM_PIXELS)]
+    pygame.init()
+    screen = pygame.display.set_mode(size)
+    screen.fill((0,0,0))
+
+    return [FakeStrip(screen, i, NUM_PIXELS, PIX_WH) for i in range(NUM_PIXELS)]
+
+
+def setup_leds():
+    import board
+    import neopixel
+    gpios = [board.D12, board.D13, board.D18, board.D19]
+    pixels_strips = []
+    for i in gpios:
+        try:
+            pixels_strips += [neopixel.NeoPixel(i, 12, auto_write=False)]
+            print("gpio ", i, "success")
+        except:
+            print("gpio ", i, "fail")
+    return pixels_strips
+
+pixels_strips = setup_leds()
 
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 text_disp = TextDisplayer(pixels_strips, 0)
@@ -45,9 +63,6 @@ text_l = [x for x in text]
 text_offset = 0
 texts_idx = 0
 while 1:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
 
     text_end = text_disp.display_text(texts_l[texts_idx % len(texts_l)], texts_l[(texts_idx + 1) % len(texts_l)], text_offset)
     if text_end:
